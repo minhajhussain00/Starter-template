@@ -2,16 +2,19 @@ import type { RequestHandler } from './$types';
 
 import Stripe from "stripe";
 import { auth } from "$lib/server/auth"; 
-import { connectToDB } from "$lib/server/db/connect"; // your MongoDB client
+import { connectToDB } from "$lib/server/db/connect"; 
 import mongoose from "mongoose";
 import { PRIVATE_STRIPE_SECRET_KEY } from "$env/static/private";
 
 const stripe = new Stripe(PRIVATE_STRIPE_SECRET_KEY!);
 
-export const POST:RequestHandler = async (req) => {
+export const POST: RequestHandler = async (req) => {
   const session = await auth.api.getSession({
-      headers:req
-  });
+    query: {
+        disableCookieCache: true,
+    }, 
+    headers: req.request.headers, 
+});
   if (!session) return new Response("Unauthorized",{ status: 401 });
     await connectToDB();
   const user = await mongoose.model("User").findOne({ id: session.user.id });

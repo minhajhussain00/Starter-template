@@ -15,7 +15,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	signIn: async (event) => {
+	default: async (event) => {
 		const form = await superValidate(event, zod(formSchema));
 
 		if (!form.valid) {
