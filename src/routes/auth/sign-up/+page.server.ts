@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from './$types.js';
 import { auth } from '$lib/server/auth.js';
 import { fail} from '@sveltejs/kit';
-import { signupSchema } from './schema';
+import { formSchema } from './schema';
 import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { APIError } from 'better-auth/api';
@@ -9,14 +9,14 @@ import { APIError } from 'better-auth/api';
 
 export const load: PageServerLoad = async () => {
 	return {
-		form: await superValidate(zod(signupSchema))
+		form: await superValidate(zod(formSchema))
 	};
 };
 
 export const actions:Actions = {
   default: async (event) => {
 	console.log("request")
-	const form = await superValidate(event, zod(signupSchema));
+	const form = await superValidate(event, zod(formSchema));
 
     if (!form.valid) {
       return fail(400, { form });

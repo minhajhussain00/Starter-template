@@ -20,12 +20,18 @@ export const auth = betterAuth({
     database: mongodbAdapter(db),
     emailAndPassword: {
         enabled: true,
+        requireEmailVerification: true,
+		sendResetPassword: async ({ user, url, token }, request) => {
+			console.log(`Send reset password email for ${user.email} url ${url}`);
+		}
     },
+
     emailVerification: {
         sendOnSignUp: true,
         sendVerificationEmail: async ({ user, url, token }, request) => {
             await sendVerificationEmail(user.email, url, token);
         }
+        
     },
     forgetPassword: {
         sendResetPassword: async ({ user, url, token }: any, request: any) => {
@@ -38,7 +44,8 @@ export const auth = betterAuth({
             stripeClient,
             stripeWebhookSecret: PRIVATE_STRIPE_WEBHOOK_SECRET!,
             createCustomerOnSignUp: true,
-        })
+        }),
+        
     ],
     user: {
         additionalFields: {

@@ -1,65 +1,103 @@
 <script lang="ts">
-  import * as Form from '$lib/components/ui/form';
-  import { Input } from '$lib/components/ui/input';
-  import { Button } from '$lib/components/ui/button';
-  import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import * as Form from '$lib/components/ui/form';
+	import * as Card from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
+	import { formSchema } from './schema';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import Password from '$lib/components/password.svelte';
 
+	import type { PageData } from './$types';
 
- const {data} = $props()
-  const form = superForm(data.form);
-
-    const { form: formData, enhance, submitting } = form;
+	let { data }: { data: PageData } = $props();
+	let form = $derived(
+		superForm(data.form, {
+			validators: zodClient(formSchema),
+			dataType: 'json'
+		})
+	);
+	let formData = $derived(form.form);
+	let errors = $derived(form.errors);
+	let message = $derived(form.message);
+	let submitting = $derived(form.submitting);
+	let enhance = $derived(form.enhance);
 </script>
 
-<SuperDebug data={form.form}/>
+<Card.Root class="mx-auto mt-[50vh] max-w-sm -translate-y-1/2">
+	<Card.Header class="text-center">
+		<Card.Title class="text-2xl">Sign up</Card.Title>
+		<Card.Description>Enter your information to create an account</Card.Description>
+	</Card.Header>
+	<Card.Content class="flex flex-col gap-4">
+		{#if $message}
+			<div class="mt-3 rounded-md text-center text-green-700">
+				{$message}
+			</div>
+		{/if}
 
-<form use:enhance method="POST" class="space-y-4">
-  <Form.Field {form} name="firstName">
-    <Form.Control>
-     {#snippet children({ props })}
-        <Form.Label>first name</Form.Label>
-        <Input {...props} bind:value={$formData.firstName} />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
+		<form method="POST"  use:enhance class="flex flex-col gap-2">
+			<Form.Field {form} name="firstName">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>first name</Form.Label>
+						<Input {...props} bind:value={$formData.firstName} placeholder="Enter your name" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-  <Form.Field {form} name="lastName">
-    <Form.Control >
-      {#snippet children({ props })}
-        <Form.Label>last name</Form.Label>
-        <Input {...props} bind:value={$formData.lastName} />
-      {/snippet}
+	<Form.Field {form} name="lastName">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>last name</Form.Label>
+						<Input {...props} bind:value={$formData.lastName} placeholder="Enter your name" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
+			<Form.Field {form} name="email">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Email</Form.Label>
+						<Input {...props} bind:value={$formData.email} placeholder="Enter your email" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-  <Form.Field {form} name="email">
-    <Form.Control >
-      {#snippet children({ props })}
-        <Form.Label>email</Form.Label>
-        <Input {...props} bind:value={$formData.email} />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
+			<Form.Field {form} name="password">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Password</Form.Label>
+						<Password bind:value={$formData.password} {props} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-  <Form.Field {form} name="password">
-    <Form.Control>
-      {#snippet children({ props })}
-        <Form.Label>Username</Form.Label>
-        <Input type="password" {...props} bind:value={$formData.password} />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
+			<Form.Field {form} name="passwordConfirm">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Confirm Password</Form.Label>
+						<Password bind:value={$formData.passwordConfirm} {props} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-  {#if form.message}
-    <p class="text-sm text-red-600">{form.message}</p>
-  {/if}
+			<div class="flex justify-between pb-6">
+				<a href="/auth/sign-in">Sign in Instead</a>
+			</div>
 
-  <Button type="submit" disabled={$submitting}>
-    {#if $submitting} Signing up... {:else} Sign Up {/if}
-  </Button>
-</form>
+			<Form.Button disabled={$submitting} class="w-full">
+				{$submitting ? 'Submitting...' : 'Submit'}
+			</Form.Button>
+			{#if $errors?._errors}
+				<div class="mt-3 rounded-md text-red-700">
+					{$errors?._errors}
+				</div>
+			{/if}
+		</form>
+	</Card.Content>
+</Card.Root>
