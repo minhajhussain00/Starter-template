@@ -23,20 +23,34 @@ export const actions: Actions = {
 		}
 
 		try {
+			console.log(`🔄 Processing forgot password request for email: ${form.data.email}`);
+			
 			await auth.api.forgetPassword({
 				body: {
 					email: form.data.email
 				}
 			});
 			
+			console.log('✅ Forgot password request processed successfully');
 			// Redirect to success page or show success message
 			return redirect(302, '/auth/forgot-password?sent=true');
 		} catch (error) {
+			console.error('❌ Error during password reset request:', error);
+			
 			if (error instanceof APIError) {
-				// Don't reveal if email exists for security reasons
+				// Check if this is an email sending error
+				if (error.message?.includes('Email service not configured') || 
+				    error.message?.includes('Failed to send reset password email')) {
+					// This is an actual email sending error, don't hide it
+					console.error('Email sending failed:', error.message);
+					return setError(form, 'Unable to send reset email. Please contact support or try again later.');
+				}
+				// For other API errors (like user not found), still redirect to success for security
+				console.log('API error (likely user not found):', error.message);
 				return redirect(302, '/auth/forgot-password?sent=true');
 			}
-			console.log('Unexpected error during password reset request', error);
+			
+			console.error('Unexpected error during password reset request:', error);
 			return setError(form, 'Unable to process request. Please try again.');
 		}
 	}

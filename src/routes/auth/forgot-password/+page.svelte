@@ -7,7 +7,7 @@
  	import * as Card from '$lib/components/ui/card';
   const { data } = $props();
   const form = superForm(data.form);
-  const { form: formData, enhance, submitting } = form;
+  const { form: formData, enhance, submitting, errors } = form;
   
   // Check if email was sent successfully
   const emailSent = $derived($page.url.searchParams.get('sent') === 'true');
@@ -23,6 +23,15 @@
 	</Card.Header>
   <Card.Content>
    {#if !emailSent}
+    <!-- Display general form errors -->
+    {#if $errors._errors}
+      <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-red-600 text-sm">
+          {$errors._errors.join(', ')}
+        </p>
+      </div>
+    {/if}
+    
     <form use:enhance method="POST" class="space-y-6">
       <Form.Field {form} name="email">
         <Form.Control>

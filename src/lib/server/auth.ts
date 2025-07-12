@@ -20,16 +20,14 @@ export const auth = betterAuth({
     database: mongodbAdapter(db),
     emailAndPassword: {
         enabled: true,
+        sendResetPassword: async ({ user, url, token }: any, request: any) => {
+            await sendResetPasswordEmail(user.email, url, token);
+        }
     },
     emailVerification: {
         sendOnSignUp: true,
         sendVerificationEmail: async ({ user, url, token }, request) => {
             await sendVerificationEmail(user.email, url, token);
-        }
-    },
-    forgetPassword: {
-        sendResetPassword: async ({ user, url, token }: any, request: any) => {
-            await sendResetPasswordEmail(user.email, url, token);
         }
     },
     plugins: [
