@@ -2,13 +2,28 @@ import { PRIVATE_RESEND_KEY } from '$env/static/private';
 import { PUBLIC_BASE_URL } from '$env/static/public';
 import { Resend } from 'resend';
 
+// Validate Resend API key
+if (!PRIVATE_RESEND_KEY || PRIVATE_RESEND_KEY === 'test_key') {
+  console.warn('⚠️  Warning: Invalid or missing PRIVATE_RESEND_KEY. Email functionality will not work.');
+}
+
 const resend = new Resend(PRIVATE_RESEND_KEY);
 
 export async function sendVerificationEmail(email: string, url: string, token: string) {
 
+  // Check if we have a valid API key
+  if (!PRIVATE_RESEND_KEY || PRIVATE_RESEND_KEY === 'test_key') {
+    const error = 'Email service not configured properly. Missing or invalid PRIVATE_RESEND_KEY.';
+    console.error('❌ Verification email failed:', error);
+    throw new Error(error);
+  }
+
   const verifyUrl = url.startsWith("http")
     ? url 
     : `${PUBLIC_BASE_URL}/api/auth${url}`;
+    
+  console.log(`📧 Attempting to send verification email to: ${email}`);
+  console.log(`🔗 Verification URL: ${verifyUrl}`);
     
   const { data, error } = await resend.emails.send({
     from: 'onboarding@resend.dev', 
@@ -17,24 +32,35 @@ export async function sendVerificationEmail(email: string, url: string, token: s
     html: `
       <h2>Welcome to Acme</h2>
       <p>Please verify your email by clicking the link below:</p>
-      <p><a href="${verifyUrl}">Click here</a> to verifiy your email</p>
+      <p><a href="${verifyUrl}">Click here</a> to verify your email</p>
       <p>This link will expire shortly. If you did not create an account, feel free to ignore this email.</p>
     `,
   });
 
   if (error) {
-    console.error('Resend email errorsrsr:', error);
-    throw new Error('Failed to send verification email');
+    console.error('❌ Resend verification email error:', error);
+    throw new Error(`Failed to send verification email: ${error.message || 'Unknown error'}`);
   }
-    console.log(data)
+  
+  console.log('✅ Verification email sent successfully:', data);
   return data;
 }
 
 export async function sendResetPasswordEmail(email: string, url: string, token: string) {
   
+  // Check if we have a valid API key
+  if (!PRIVATE_RESEND_KEY || PRIVATE_RESEND_KEY === 'test_key') {
+    const error = 'Email service not configured properly. Missing or invalid PRIVATE_RESEND_KEY.';
+    console.error('❌ Reset password email failed:', error);
+    throw new Error(error);
+  }
+  
   const resetUrl = url.startsWith("http")
     ? url 
     : `${PUBLIC_BASE_URL}/auth/reset-password?token=${token}`;
+    
+  console.log(`📧 Attempting to send reset password email to: ${email}`);
+  console.log(`🔗 Reset URL: ${resetUrl}`);
     
   const { data, error } = await resend.emails.send({
     from: 'onboarding@resend.dev', 
@@ -49,9 +75,10 @@ export async function sendResetPasswordEmail(email: string, url: string, token: 
   });
 
   if (error) {
-    console.error('Resend email error:', error);
-    throw new Error('Failed to send reset password email');
+    console.error('❌ Resend email error:', error);
+    throw new Error(`Failed to send reset password email: ${error.message || 'Unknown error'}`);
   }
-  console.log(data)
+  
+  console.log('✅ Reset password email sent successfully:', data);
   return data;
 }
