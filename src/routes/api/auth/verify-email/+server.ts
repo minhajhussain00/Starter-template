@@ -17,7 +17,7 @@ export const GET:RequestHandler = async ({ url }) => {
         callbackURL: '/auth/verification-success'
     }
 })
-
+	console.log("redirecting")
     throw redirect(302, "/auth/verification-success");
   } catch (err) {
     console.error('Email verification failed:', err);

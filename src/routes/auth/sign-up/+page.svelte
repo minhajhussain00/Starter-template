@@ -86,9 +86,9 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<div class="flex justify-between pb-6">
-				<a href="/auth/sign-in">Sign in Instead</a>
-			</div>
+			
+			<a href="/auth/sign-in" class="text-blue-500">Sign in Instead</a>
+			
 
 			<Form.Button disabled={$submitting} class="w-full">
 				{$submitting ? 'Submitting...' : 'Submit'}
