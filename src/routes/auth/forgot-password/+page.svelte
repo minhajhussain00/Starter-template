@@ -4,7 +4,7 @@
   import { Button } from '$lib/components/ui/button';
   import { superForm } from 'sveltekit-superforms';
   import { page } from '$app/stores';
-
+ 	import * as Card from '$lib/components/ui/card';
   const { data } = $props();
   const form = superForm(data.form);
   const { form: formData, enhance, submitting } = form;
@@ -12,25 +12,17 @@
   // Check if email was sent successfully
   const emailSent = $derived($page.url.searchParams.get('sent') === 'true');
 </script>
-
-<div class="max-w-md mx-auto mt-10 bg-white p-10 rounded-lg shadow space-y-6 border border-gray-200">
-  <div class="text-center">
-    <h2 class="text-2xl font-bold text-gray-900 mb-2">Forgot Password</h2>
+<Card.Root class="mx-auto mt-[50vh] max-w-sm -translate-y-1/2 p-10">
+	<Card.Header class="text-center">
+		<Card.Title class="text-2xl">Forgot Password</Card.Title>
     {#if emailSent}
-      <p class="text-green-600 text-sm mb-4">
-        If an account with that email exists, we've sent you a password reset link.
-      </p>
-      <a href="/auth/sign-in" class="text-blue-600 hover:text-blue-500 text-sm">
-        Back to Sign In
-      </a>
-    {:else}
-      <p class="text-gray-600 text-sm mb-6">
-        Enter your email address and we'll send you a link to reset your password.
-      </p>
+		<Card.Description class="text-green-400"> If an account with that email exists, we've sent you a password reset link.</Card.Description>
+     {:else}
+     <Card.Description>  Enter your email address and we'll send you a link to reset your password.</Card.Description>
     {/if}
-  </div>
-
-  {#if !emailSent}
+	</Card.Header>
+  <Card.Content>
+   {#if !emailSent}
     <form use:enhance method="POST" class="space-y-6">
       <Form.Field {form} name="email">
         <Form.Control>
@@ -58,9 +50,10 @@
     </form>
 
     <div class="text-center">
-      <a href="/auth/sign-in" class="text-blue-600 hover:text-blue-500 text-sm">
+      <a href="/auth/sign-in" class="text-blue-600 mt-10 hover:text-blue-500 text-sm">
         Back to Sign In
       </a>
     </div>
   {/if}
-</div>
+  </Card.Content>
+</Card.Root>

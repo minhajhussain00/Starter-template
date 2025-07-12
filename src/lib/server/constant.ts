@@ -1,1 +1,1 @@
-export const dbName:string = "ecommerce"
+export const dbName:string = "test"

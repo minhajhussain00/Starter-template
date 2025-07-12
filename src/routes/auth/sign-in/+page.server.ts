@@ -41,13 +41,4 @@ export const actions: Actions = {
 		}
 		return redirect(302, '/');
 	},
-	google: async () => {
-		const res = await auth.api.signInSocial({
-			body: {
-				provider: 'google',
-				callbackURL: '/'
-			}
-		});
-		return redirect(302, res.url!);
-	}
 };

@@ -28,7 +28,7 @@ export const actions:Actions = {
     try {
 			await auth.api.signUpEmail({
 				body: {
-					name:"user",
+					name:`${firstName} ${lastName}`,
 					email,
 					password,
 
