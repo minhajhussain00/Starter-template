@@ -29,7 +29,6 @@ export const actions: Actions = {
 			});
 		}
 
-		try {
 			await auth.api.resetPassword({
 				body: {
 					token: form.data.token,
@@ -37,14 +36,8 @@ export const actions: Actions = {
 				}
 			});
 			
-			// Redirect to sign in with success message
-			return redirect(302, '/auth/sign-in?reset=true');
-		} catch (error) {
-			if (error instanceof APIError) {
-				return setError(form, error.message || 'Invalid or expired reset token');
-			}
-			console.log('Unexpected error during password reset', error);
-			return setError(form, 'Unable to reset password. Please try again.');
-		}
+			
+			throw redirect(302, '/auth/sign-in?reset=true');
+		
 	}
 };
