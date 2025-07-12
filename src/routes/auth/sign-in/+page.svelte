@@ -1,54 +1,77 @@
 <script lang="ts">
-  import * as Form from '$lib/components/ui/form';
-  import { Input } from '$lib/components/ui/input';
-  import { Button } from '$lib/components/ui/button';
-  import { superForm } from 'sveltekit-superforms';
+	import * as Form from '$lib/components/ui/form';
+	import * as Card from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
+	import { formSchema, type FormSchema } from './schema';
+	import { superForm } from 'sveltekit-superforms';
+	import Password from '$lib/components/password.svelte';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import type { PageData } from './$types';
 
-  const { data } = $props();
-  const form = superForm(data.form);
-  const { form: formData, enhance, submitting } = form;
+	let { data }: { data: PageData } = $props();
+	let form = $derived(
+		superForm(data.form, {
+			validators: zodClient(formSchema),
+			dataType: 'json'
+		})
+	);
+	let formData = $derived(form.form);
+	let errors = $derived(form.errors);
+	let submitting = $derived(form.submitting);
+	let enhance = $derived(form.enhance);
 </script>
 
-<form
-  use:enhance
-  method="POST"
-  class="max-w-md mx-auto mt-10 bg-white p-10 rounded-lg shadow space-y-6 border border-gray-200"
->
-  <Form.Field {form} name="email">
-    <Form.Control>
-      {#snippet children({ props })}
-        <Form.Label class="block mb-1 text-sm font-medium text-gray-700">Email</Form.Label>
-        <Input
-          {...props}
-          bind:value={$formData.email}
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors class="text-red-500 text-xs mt-1" />
-  </Form.Field>
+<Card.Root class="mx-auto mt-[50vh] max-w-sm -translate-y-1/2">
+	<Card.Header class="text-center">
+		<Card.Title class="text-2xl">Sign In</Card.Title>
+		<Card.Description>Enter your email below to sign into your account</Card.Description>
+	</Card.Header>
+	<Card.Content class="flex flex-col gap-4">
+		<div class="relative flex items-center py-3">
+			<hr class="flex-1 border-slate-500" />
+			<span class="mx-4 text-xs text-slate-500">OR</span>
+			<hr class="flex-1 border-slate-500" />
+		</div>
 
-  <Form.Field {form} name="password">
-    <Form.Control>
-      {#snippet children({ props })}
-        <Form.Label class="block mb-1 text-sm font-medium text-gray-700">Password</Form.Label>
-        <Input
-          {...props}
-          type="password"
-          bind:value={$formData.password}
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2"
-        />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors class="text-red-500 text-xs mt-1" />
-  </Form.Field>
+		<form method="POST" use:enhance>
+			<Form.Field {form} name="email">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Email</Form.Label>
+						<Input
+							{...props}
+							bind:value={$formData.email}
+							type="email"
+							placeholder="Enter your email"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-  <a href="/auth/sign-up" class="text-blue-700">create account</a>
-  <Button
-    type="submit"
-    disabled={$submitting}
-    class="w-full py-2 px-4 text-white font-semibold rounded mt-3"
-  >
-    {#if $submitting} Signing in... {:else} Sign In {/if}
-  </Button>
-</form>
+			<Form.Field {form} name="password">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Password</Form.Label>
+						<Password bind:value={$formData.password} {props} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<div class="flex justify-between pb-3">
+				<a href="/auth/sign-up">Sign up</a>
+				<a href="/auth/forgot-password">Forgot password?</a>
+			</div>
+
+			<Form.Button disabled={$submitting} class="w-full">
+				{$submitting ? 'Submitting...' : 'Submit'}
+			</Form.Button>
+			{#if $errors?._errors}
+				<div class="mt-3 rounded-md text-red-700">
+					{$errors?._errors}
+				</div>
+			{/if}
+		</form>
+	</Card.Content>
+</Card.Root>

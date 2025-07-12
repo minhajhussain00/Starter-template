@@ -1,4 +1,3 @@
-// src/lib/server/email.ts
 import { PRIVATE_RESEND_KEY } from '$env/static/private';
 import { PUBLIC_BASE_URL } from '$env/static/public';
 import { Resend } from 'resend';
@@ -18,7 +17,7 @@ export async function sendVerificationEmail(email: string, url: string, token: s
     html: `
       <h2>Welcome to Acme</h2>
       <p>Please verify your email by clicking the link below:</p>
-      <p><a href="${verifyUrl}">${verifyUrl}</a></p>
+      <p><a href="${verifyUrl}">Click here</a> to verifiy your email</p>
       <p>This link will expire shortly. If you did not create an account, feel free to ignore this email.</p>
     `,
   });
