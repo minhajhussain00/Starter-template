@@ -6,7 +6,7 @@ import { stripe } from "@better-auth/stripe"
 import Stripe from "stripe"
 import { PRIVATE_MONGODB_URI, PRIVATE_STRIPE_SECRET_KEY, PRIVATE_STRIPE_WEBHOOK_SECRET } from "$env/static/private";
 import { dbName } from "./constant";
-import { sendVerificationEmail } from "./email/emails";
+import { sendVerificationEmail, sendResetPasswordEmail } from "./email/emails";
 
 const stripeClient = new Stripe(PRIVATE_STRIPE_SECRET_KEY!, {
     apiVersion: "2025-06-30.basil",
@@ -32,6 +32,11 @@ export const auth = betterAuth({
             await sendVerificationEmail(user.email, url, token);
         }
         
+    },
+    forgetPassword: {
+        sendResetPassword: async ({ user, url, token }: any, request: any) => {
+            await sendResetPasswordEmail(user.email, url, token);
+        }
     },
     plugins: [
         svelteCookies(),
