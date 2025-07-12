@@ -3,10 +3,14 @@
   import { Input } from '$lib/components/ui/input';
   import { Button } from '$lib/components/ui/button';
   import { superForm } from 'sveltekit-superforms';
+  import { page } from '$app/stores';
 
   const { data } = $props();
   const form = superForm(data.form);
   const { form: formData, enhance, submitting } = form;
+  
+  // Check if password was reset successfully
+  const passwordReset = $derived($page.url.searchParams.get('reset') === 'true');
 </script>
 
 <form
@@ -14,6 +18,13 @@
   method="POST"
   class="max-w-md mx-auto mt-10 bg-white p-10 rounded-lg shadow space-y-6 border border-gray-200"
 >
+  {#if passwordReset}
+    <div class="text-center">
+      <p class="text-green-600 text-sm mb-4">
+        Your password has been reset successfully. Please sign in with your new password.
+      </p>
+    </div>
+  {/if}
   <Form.Field {form} name="email">
     <Form.Control>
       {#snippet children({ props })}
@@ -43,7 +54,10 @@
     <Form.FieldErrors class="text-red-500 text-xs mt-1" />
   </Form.Field>
 
-  <a href="/auth/sign-up" class="text-blue-700">create account</a>
+  <div class="flex justify-between items-center">
+    <a href="/auth/sign-up" class="text-blue-700 text-sm">create account</a>
+    <a href="/auth/forgot-password" class="text-blue-700 text-sm">forgot password?</a>
+  </div>
   <Button
     type="submit"
     disabled={$submitting}
