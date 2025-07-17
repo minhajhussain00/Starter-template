@@ -17,18 +17,18 @@ export const POST: RequestHandler = async (req) => {
 });
   if (!session) return new Response("Unauthorized",{ status: 401 });
     await connectToDB();
-  const user = await mongoose.model("User").findOne({ id: session.user.id });
+    console.log("adfas",session)
 
-  if (!user?.stripeCustomerId) {
+  if (!session?.user.stripeCustomerId) {
     return new Response("No Stripe customer ID found", { status: 400 });
   }
 
   const checkoutSession = await stripe.checkout.sessions.create({
-    customer: user.stripeCustomerId,
+    customer: session.user.stripeCustomerId,
     payment_method_types: ["card"],
     line_items: [
       {
-        price: "price_123", 
+        price: "price_1RidZn2ZZENLEOlobeqkeucd", 
         quantity: 1,
       },
     ],
@@ -36,7 +36,7 @@ export const POST: RequestHandler = async (req) => {
     success_url: "http://localhost:5173/success",
     cancel_url: "http://localhost:5173/cancel",
   });
-
+  console.log(checkoutSession.url)
   return new Response(
     JSON.stringify({ url: checkoutSession.url }),
     { status: 200 }

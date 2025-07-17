@@ -34,6 +34,18 @@
        <Button type="submit" variant="destructive" class="px-8 py-4">Signout</Button>
        </form>
        
+       <div class="flex items-center justify-center">
+        <Button
+        onclick={async () => {
+          console.log("asdf")
+        const res = await fetch('/api/checkout', { method: 'POST' });
+        const data = await res.json();
+        if (data && data.url) {
+          window.location.href = data.url;
+        }
+      }} 
+       >checkout</Button></div>
+     
       </CardContent>
     </Card>
   </div>
